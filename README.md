@@ -72,6 +72,12 @@ All the identities must follow the following scheme:
 All entities are created in the listed order. An example scheme is built in.  
 If you have CAs they should be listed before the identities that need to be signed by that CA.  
 
+### Tags
+The following tags are available:
+- private_keys
+- public_keys
+- full_chains
+
 ### Sensitive information
 The sensitive information should be further protected using, for example, ansible-vault:  
 ```bash
