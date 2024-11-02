@@ -1,0 +1,187 @@
+---
+config:
+  retain_csr: False
+
+identities:
+- name: RootCA
+  passphrase: "{{ vault_RootCA_passphrase }}"
+  sans:
+  - 'DNS:Root CA'
+  key_usage:
+  - keyCertSign
+  - digitalSignature
+  - cRLSign
+  extended_key_usage: []
+  cert_duration: 365d
+  private_key_type: RSA
+  private_key_size: 4096
+  ca: True
+  provider: selfsigned
+
+- name: LocalCA
+  passphrase: "{{ vault_LocalCA_passphrase }}"
+  sans:
+  - 'DNS:Local CA'
+  key_usage:
+  - keyCertSign
+  - digitalSignature
+  - cRLSign
+  extended_key_usage: []
+  cert_duration: 365d
+  private_key_type: RSA
+  private_key_size: 4096
+  ca: True
+  provider: RootCA
+  provider_passphrase: "{{ vault_RootCA_passphrase }}"
+
+- name: LocalCA2
+  passphrase: "{{ vault_LocalCA2_passphrase }}"
+  sans:
+  - 'DNS:Local CA 2'
+  key_usage:
+  - keyCertSign
+  - digitalSignature
+  - cRLSign
+  extended_key_usage: []
+  cert_duration: 365d
+  private_key_type: RSA
+  private_key_size: 4096
+  ca: True
+  provider: RootCA
+  provider_passphrase: "{{ vault_RootCA_passphrase }}"
+
+- name: server0.example.com
+  passphrase: "{{ vault_server0_example_com_passphrase }}"
+  sans:
+  - "DNS:server0.example.com"
+  - "DNS:server0.alternative.example.com"
+  key_usage:
+  - digitalSignature
+  - keyEncipherment
+  - dataEncipherment
+  extended_key_usage:
+  - serverAuth
+  - clientAuth
+  cert_duration: 365d
+  private_key_type: RSA
+  private_key_size: 2048
+  ca: False
+  provider: LocalCA
+  provider_passphrase: "{{ vault_LocalCA_passphrase }}"
+
+- name: server1.example.com
+  passphrase: "{{ vault_server1_example_com_passphrase }}"
+  sans:
+  - "DNS:server1.example.com"
+  - "DNS:server1.alternative.example.com"
+  key_usage:
+  - digitalSignature
+  - keyEncipherment
+  - dataEncipherment
+  extended_key_usage:
+  - serverAuth
+  - clientAuth
+  cert_duration: 365d
+  private_key_type: ECC
+  private_key_ecc_curve: secp256r1
+  ca: False
+  provider: LocalCA
+  provider_passphrase: "{{ vault_LocalCA_passphrase }}"
+
+- name: server2.example.com
+  passphrase: "{{ vault_server2_example_com_passphrase }}"
+  sans:
+  - "DNS:server2.example.com"
+  - "DNS:server2.alternative.example.com"
+  key_usage:
+  - digitalSignature
+  - keyEncipherment
+  - dataEncipherment
+  extended_key_usage:
+  - serverAuth
+  - clientAuth
+  cert_duration: 365d
+  private_key_type: ECC
+  private_key_ecc_curve: secp256r1
+  ca: False
+  provider: LocalCA
+  provider_passphrase: "{{ vault_LocalCA_passphrase }}"
+
+- name: server3.example.com
+  passphrase: "{{ vault_server3_example_com_passphrase }}"
+  sans:
+  - "DNS:server3.example.com"
+  - "DNS:server3.alternative.example.com"
+  key_usage:
+  - digitalSignature
+  - keyEncipherment
+  - dataEncipherment
+  extended_key_usage:
+  - serverAuth
+  - clientAuth
+  cert_duration: 365d
+  private_key_type: ECC
+  private_key_ecc_curve: secp256r1
+  ca: False
+  provider: LocalCA
+  provider_passphrase: "{{ vault_LocalCA_passphrase }}"
+
+- name: server4.example.com
+  passphrase: "{{ vault_server4_example_com_passphrase }}"
+  sans:
+  - "DNS:server4.example.com"
+  - "DNS:server4.alternative.example.com"
+  key_usage:
+  - digitalSignature
+  - keyEncipherment
+  - dataEncipherment
+  extended_key_usage:
+  - serverAuth
+  - clientAuth
+  cert_duration: 365d
+  private_key_type: ECC
+  private_key_ecc_curve: secp256r1
+  ca: False
+  provider: LocalCA
+  provider_passphrase: "{{ vault_LocalCA_passphrase }}"
+
+- name: server5.example.com
+  passphrase: "{{ vault_server5_example_com_passphrase }}"
+  sans:
+  - "DNS:server5.example.com"
+  - "DNS:server5.alternative.example.com"
+  key_usage:
+  - digitalSignature
+  - keyEncipherment
+  - dataEncipherment
+  extended_key_usage:
+  - serverAuth
+  - clientAuth
+  cert_duration: 365d
+  private_key_type: ECC
+  private_key_ecc_curve: secp384r1
+  ca: False
+  provider: LocalCA
+  provider_passphrase: "{{ vault_LocalCA_passphrase }}"
+
+- name: server6.example.com
+  passphrase: "{{ vault_server6_example_com_passphrase }}"
+  sans:
+  - "DNS:server6.example.com"
+  - "DNS:server6.alternative.example.com"
+  key_usage:
+  - digitalSignature
+  - keyEncipherment
+  - dataEncipherment
+  extended_key_usage:
+  - serverAuth
+  - clientAuth
+  cert_duration: 365d
+  private_key_type: ECC
+  private_key_ecc_curve: secp384r1
+  ca: False
+  provider: LocalCA2
+  provider_passphrase: "{{ vault_LocalCA2_passphrase }}"
+  
+...
+

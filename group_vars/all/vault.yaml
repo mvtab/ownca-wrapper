@@ -1,0 +1,14 @@
+---
+vault_RootCA_passphrase: blablatester2
+vault_LocalCA_passphrase: blablatester3
+vault_LocalCA2_passphrase: blablatester10
+vault_server0_example_com_passphrase: blablatester4
+vault_server1_example_com_passphrase: blablatester5
+vault_server2_example_com_passphrase: blablatester6
+vault_server3_example_com_passphrase: blablatester7
+vault_server4_example_com_passphrase: blablatester8
+vault_server5_example_com_passphrase: blablatester9
+vault_server6_example_com_passphrase: blablatester11
+
+...
+

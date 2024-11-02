@@ -1,0 +1,159 @@
+---
+# tasks file for ownca-wrapper
+- name: Check if private key is present
+  ansible.builtin.stat:
+    path: certs/{{ item.name }}.key
+  register: private_keys
+  loop: "{{ identities }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+  - private_keys
+
+- name: Create private keys
+  community.crypto.openssl_privatekey:
+    path: certs/{{ item.item.name }}.key
+    passphrase: "{{ item.item.passphrase }}"
+    type: "{{ item.item.private_key_type }}"
+    size: "{{ item.item.private_key_size }}"
+    state: present
+  when: not item.stat.exists
+        and not (item.item.private_key_type == 'ECC')
+  loop: "{{ private_keys.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  tags:
+  - private_keys
+
+- name: Create ECC private keys
+  community.crypto.openssl_privatekey:
+    path: certs/{{ item.item.name }}.key
+    passphrase: "{{ item.item.passphrase }}"
+    type: "{{ item.item.private_key_type }}"
+    curve: "{{ item.item.private_key_ecc_curve }}"
+    state: present
+  when: not item.stat.exists
+        and (item.item.private_key_type == 'ECC')
+  loop: "{{ private_keys.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  tags:
+  - private_keys
+
+- name: Check if public certificate is present
+  ansible.builtin.stat:
+    path: certs/{{ item.name }}.pem
+  register: public_certs
+  loop: "{{ identities }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+  - public_keys
+
+- name: Create CSR for server cert
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: certs/{{ item.item.name }}.key
+    privatekey_passphrase: "{{ item.item.passphrase }}"
+    common_name: "{{ item.item.name }}"
+    subject_alt_name: "{{ item.item.sans }}"
+    use_common_name_for_san: False
+    basic_constraints:
+    - 'CA:{{ item.item.ca | upper }}'
+    basic_constraints_critical: True
+    key_usage: "{{ item.item.key_usage }}"
+    extended_key_usage: "{{ item.item.extended_key_usage }}"
+    key_usage_critical: True
+  register: server_csr
+  when: not item.stat.exists
+  loop: "{{ public_certs.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  tags:
+  - public_keys
+
+- name: Write certificate signing requests to disk
+  ansible.builtin.copy:
+    dest: "certs/{{ item.item.item.name }}.csr"
+    content: "{{ item.csr }}"
+  loop: "{{ server_csr.results }}"
+  loop_control:
+    label: "{{ item.item.item.name }}"
+  when: item is changed
+        and config.retain_csr
+  tags:
+  - public_keys
+
+- name: Self sign certs
+  community.crypto.x509_certificate:
+    path: "certs/{{ item.item.item.name }}.pem"
+    csr_content: "{{ item.csr }}"
+    privatekey_path: "certs/{{ item.item.item.name }}.key"
+    privatekey_passphrase: "{{ item.item.item.passphrase }}"
+    provider: selfsigned
+    state: present
+  when: item is changed
+        and item.item.item.provider == 'selfsigned'
+  register: create_selfsigned_certs
+  loop: "{{ server_csr.results }}"
+  loop_control:
+    label: "{{ item.item.item.name }}"
+  tags:
+  - public_keys
+
+- name: Sign public certs
+  community.crypto.x509_certificate:
+    csr_content: "{{ item.csr }}"
+    ownca_path: "certs/{{ item.item.item.provider }}.pem"
+    ownca_privatekey_path: "certs/{{ item.item.item.provider }}.key"
+    ownca_privatekey_passphrase: "{{ item.item.item.provider_passphrase }}"
+    ownca_not_after: "+{{ item.item.item.cert_duration }}"
+    path: certs/{{ item.item.item.name }}.pem
+    privatekey_path: certs/{{ item.item.item.name }}.key
+    privatekey_passphrase: "{{ item.item.item.passphrase }}"
+    provider: ownca
+    state: present
+  when: item is changed
+        and not (item.item.item.provider == 'selfsigned')
+  register: create_public_certs
+  loop: "{{ server_csr.results }}"
+  loop_control:
+    label: "{{ item.item.item.name }}"
+  tags:
+  - public_keys
+
+- name: Check if server fullchain present
+  ansible.builtin.stat:
+    path: certs/{{ item.name }}.fullchain.pem
+  register: fullchains
+  loop: "{{ identities }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+  - full_chains
+
+- name: Create certificate fullchains
+  community.crypto.certificate_complete_chain:
+    input_chain: "{{ lookup('ansible.builtin.file', 'certs/{{ item.item.name }}.pem') }}"
+    root_certificates:
+    - "certs/{{ item.item.provider }}.pem"
+  register: fullchains_content
+  when: not item.stat.exists
+        and not (item.item.provider == 'selfsigned')
+        and not item.item.ca
+  loop: "{{ fullchains.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  tags:
+  - full_chains
+
+- name: Write certificate fullchains to disk
+  ansible.builtin.copy:
+    dest: "certs/{{ item.item.item.name }}.fullchain.pem"
+    content: "{{ ''.join(item.complete_chain) }}"
+  loop: "{{ fullchains_content.results }}"
+  loop_control:
+    label: "{{ item.item.item.name }}"
+  when: item.complete_chain is defined
+        and not (item.item.item.provider == 'selfsigned')
+  tags:
+  - full_chains
