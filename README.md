@@ -12,6 +12,7 @@ To spin up a demo PKI infrastructure, simply do the following:
 # Certs.
 git clone https://github.com/mvtab/ownca-wrapper
 cd ownca-wrapper
+mkdir certs
 ansible-playbook ownca-wrapper
 ```
 
