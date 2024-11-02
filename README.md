@@ -94,5 +94,5 @@ You might want to correct that.
 
 ## Limitations
 
-### No warranty
+### No liability / warranty (GPL v3.0)
 Not intensively tested, I wouldn't trust it too much.
