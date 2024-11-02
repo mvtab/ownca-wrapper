@@ -1,6 +1,6 @@
 # ownca-wrapper
 Wrapper for a few Ansible x509 modules to ease up the management of CAs.  
-Managing public certificates has become very easy nowadays. Managing an own CA, however, still has it's costs. I made this for myself, to ease up the management of CAs in test environments.
+Managing public certificates has become very easy nowadays. Managing certificates signed by an own CA, however, still has it's costs. I made this for myself, to ease up the management of CAs and their certs in test environments.
 
 ## Requirements
 - Ansible - [tutorial here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html),
@@ -81,3 +81,8 @@ ansible-playbook ownca-wrapper --ask-vault-pass
 ### Permissions
 The certificates get created as owned by the running user, typically not root.  
 You might want to correct that.  
+
+## Limitations
+
+### No warranty
+Not intensively tested, I wouldn't trust it too much.
