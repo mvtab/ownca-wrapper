@@ -45,7 +45,7 @@ EOF
 All configurations are to be found under `group_vars/all/all.yaml`.  
 All sensitive information should be kept under `group_vars/all/vault.yaml`.  
 The directory `certs/` controls the flow of the playbook. If you define a root CA with name "RootCA" and it's respective `certs/RootCA.key` is present, it will not be overwritten. It will be used to sign any referenced certificates. Same for any other file involved: if it's present the playbook will simply let it be and use it. While this brings a lot of freedom, it also creates the possibility of very tricky issues, like mismatching public certificates and private keys.  
-> Example:
+> Example:  
 > In order to recreate a private key, move it away from the `certs/` directory. Same with public keys and full chains. Keep in mind, if you change your private key, you should also remove their public key and full chain, otherwise the public key won't match the private key. Same if you change your pem: you have to change your full chain too. The full chain also has to be renewed when the identity provider changes public certificate. 
 
 ### System
