@@ -15,7 +15,7 @@ cd ownca-wrapper
 ansible-playbook ownca-wrapper
 ```
 
-To spin up an nginx test container with the freshly created certificates, run the following:
+To spin up a test nginx container with the freshly created certificates, run the following:
 ```bash
 # Nginx test.
 cd nginx-test
